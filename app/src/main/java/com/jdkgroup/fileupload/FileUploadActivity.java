@@ -1,5 +1,6 @@
 package com.jdkgroup.fileupload;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,6 +18,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import lolodev.permissionswrapper.callback.OnRequestPermissionsCallBack;
+import lolodev.permissionswrapper.wrapper.PermissionWrapper;
 
 public class FileUploadActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -43,7 +46,25 @@ public class FileUploadActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.circleivProfileImage:
-                dialogTakeImageCameraGallery();
+
+                new PermissionWrapper.Builder(this)
+                        .addPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE})
+                        //enable rationale message with a custom message
+                        .addPermissionRationale("Permission check!")
+                        //show settings dialog,in this case with default message base on requested permission/s
+                        .addPermissionsGoSettings(true)
+                        //enable callback to know what option was choosed
+                        .addRequestPermissionsCallBack(new OnRequestPermissionsCallBack() {
+                            @Override
+                            public void onGrant() {
+                                dialogTakeImageCameraGallery();
+                            }
+
+                            @Override
+                            public void onDenied(String permission) {
+
+                            }
+                        }).build().request();
                 break;
         }
     }
